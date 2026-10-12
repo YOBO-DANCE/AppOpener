@@ -60,7 +60,7 @@ def _tokens(s):
 
 def _rank(query, names, limit=10):
     # first version was just difflib.get_close_matches over everything.
-    # typed "vs code", got discord. never again. token ranking now - exact,
+    # I typed "vs code", got discord. never again. token ranking now - exact,
     # prefix, initials, substring, all-words-there, typo-per-word, in that order
     qt = _tokens(query)
     qraw = " ".join(qt)
@@ -100,7 +100,7 @@ def _rank(query, names, limit=10):
 class AppLauncher:
     def __init__(self):
         if os.name != "nt":
-            raise SystemExit('Windows only, sorry')
+            raise SystemExit('Windows only, sorry') # I wanted to write LOL, but professionalism does not allow that :( 
         self._shell = None
         self._uwp = None
         self._lnks = None
@@ -253,15 +253,33 @@ class _Completer(Completer):
 HELP = """Commands:
   <typing>          live search, Tab completes, arrows pick, enter launches
   name, name, ...  launch several apps at once
-  list              scrollable picker over every indexed app
   rescan            re-fetch newly installed apps
   help              this text
   q                 quit
   eg. type "vs code" and it actually finds vscode now"""
 
+# I generated it from a site called patorjk.com hehe >~<
+First_Statement = """
+ ██╗ ██████╗  ██████╗  ██████╗ ██╗ ██╗    ██████╗ ███████╗██╗     ██╗ █████╗ ██████╗ ██╗     ███████╗
+███║██╔═████╗██╔═████╗██╔═████╗╚═╝██╔╝    ██╔══██╗██╔════╝██║     ██║██╔══██╗██╔══██╗██║     ██╔════╝
+╚██║██║██╔██║██║██╔██║██║██╔██║  ██╔╝     ██████╔╝█████╗  ██║     ██║███████║██████╔╝██║     █████╗  
+ ██║████╔╝██║████╔╝██║████╔╝██║ ██╔╝      ██╔══██╗██╔══╝  ██║     ██║██╔══██║██╔══██╗██║     ██╔══╝  
+ ██║╚██████╔╝╚██████╔╝╚██████╔╝██╔╝██╗    ██║  ██║███████╗███████╗██║██║  ██║██████╔╝███████╗███████╗
+ ╚═╝ ╚═════╝  ╚═════╝  ╚═════╝ ╚═╝ ╚═╝    ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝╚═╝  ╚═╝╚═════╝ ╚══════╝╚══════╝
+                                                                                                     
+ █████╗ ██████╗ ██████╗     ██████╗ ██████╗ ███████╗███╗   ██╗███████╗██████╗                        
+██╔══██╗██╔══██╗██╔══██╗   ██╔═══██╗██╔══██╗██╔════╝████╗  ██║██╔════╝██╔══██╗                       
+███████║██████╔╝██████╔╝   ██║   ██║██████╔╝█████╗  ██╔██╗ ██║█████╗  ██████╔╝                       
+██╔══██║██╔═══╝ ██╔═══╝    ██║   ██║██╔═══╝ ██╔══╝  ██║╚██╗██║██╔══╝  ██╔══██╗                       
+██║  ██║██║     ██║███████╗╚██████╔╝██║     ███████╗██║ ╚████║███████╗██║  ██║                       
+╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝ ╚═════╝ ╚═╝     ╚══════╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝                       
+                                                                                                     
+"""
+
 
 def main():
     os.system("cls")
+    say(First_Statement)
     say("Loading... (first run scans apps, once)")
     launcher = AppLauncher()
     n = len(launcher.names())
@@ -295,12 +313,6 @@ def main():
         if q.lower() == "help":
             say(HELP)
             continue
-        if q.lower() == "list":
-            pick = _pick_from_list(launcher, use_pt)
-            if pick:
-                msg, tier = launcher.open(pick)
-                say(msg, tier)
-            continue
         if not q:
             continue
         if "," in q:
@@ -319,26 +331,6 @@ def main():
                 continue
         msg, tier = launcher.open(q)
         say(msg, tier)
-
-
-def _pick_from_list(launcher, use_pt):
-    names = list(launcher.names())
-    if use_pt:
-        try:
-            from prompt_toolkit.shortcuts import radiolist_dialog
-            return radiolist_dialog(
-                title="Apps",
-                text=f"{len(names)} indexed - arrows move, enter launches:",
-                values=[(n, n) for n in names]).run()
-        except Exception:
-            pass
-    for i, h in enumerate(names, 1):
-        say(f"{i}. {h}")
-    try:
-        c = input("#> ").strip()
-    except (EOFError, KeyboardInterrupt):
-        return None
-    return names[int(c) - 1] if c.isdigit() and 1 <= int(c) <= len(names) else None
 
 
 
